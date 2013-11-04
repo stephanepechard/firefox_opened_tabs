@@ -11,7 +11,7 @@ FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
 SESSION_FILE = "sessionstore.js"
 
 if not os.path.isdir(FF_DIR):
-    sys.exit("ERROR: can't find your Firefox directory :-(")
+    sys.exit("ERROR: can't find your main Firefox directory :-(")
 
 
 def find_ff_sessionstore():
@@ -44,7 +44,7 @@ def extract_urls(sessionstore):
 
 
 def generate_output(urls):
-    # generate a HTML page with the list of urls
+    """ Generate a HTML page with the list of urls. """
     tabs_list = '<ul>'
     for url in urls:
         tabs_list += '<li><a href="{url}">{url}</a></li>'.format(url=url)
@@ -59,7 +59,7 @@ def generate_output(urls):
     </body></html>
     """)
 
-    with open("firefox_tabs.html", "w") as output:
+    with open("firefox_opened_tabs.html", "w") as output:
         output.write(template.substitute(tabs_list=tabs_list))
 
 
