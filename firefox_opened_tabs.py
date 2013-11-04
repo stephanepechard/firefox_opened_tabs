@@ -1,10 +1,11 @@
 #! /usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import html
 import json
 import os
 import sys
-from string import Template
+
 
 # some constants
 FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
@@ -80,8 +81,9 @@ def extract_urls(sessionstore):
 def generate_ul(url_list):
     ul = '<ul>'
     for li_dict in url_list:
-        ul += '<li><a href="{u}">{t}</a></li>'.format(u=li_dict['url'],
-                                                      t=li_dict['title'])
+        url = html.escape(li_dict['url'])
+        title = html.escape(li_dict['title'])
+        ul += '<li><a href="{u}">{t}</a></li>'.format(u=url, t=title)
     ul += '</ul>'
     return(ul)
 
@@ -108,25 +110,31 @@ def generate_output(url_dict):
             content += '<h2>{}</h2>'.format(title)
             content += generate_ul(url_dict[key])
 
-    template = Template("""<!DOCTYPE html>
-    <html lang="en"><head>
+    return("""<!DOCTYPE html>
+    <html lang="en">
+    <head>
         <meta charset="utf-8">
-        <title>Generated list of Firefox opened tabs.</title>
-    </head><body>
-    $content
-    </body></html>
-    """)
+        <title>$title</title>
+    </head>
+    <body>
+        <h1>{title}</h1>
+        {content}
+    </body>
+    </html>
+    """.format(content=content, title='Your Firefox opened tabs'))
 
+
+def write_file(content):
     with open("firefox_opened_tabs.html", "w") as output:
-        output.write(template.substitute(content=content))
-
+        output.write(content)
     print("INFO: list of opened tabs successfully written!")
 
 
 def main():
     sessionstore = find_ff_sessionstore()
     urls = extract_urls(sessionstore)
-    generate_output(urls)
+    html = generate_output(urls)
+    write_file(html)
 
 
 if __name__ == '__main__':
