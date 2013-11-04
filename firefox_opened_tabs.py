@@ -29,7 +29,9 @@ def find_ff_sessionstore():
 def extract_urls(sessionstore):
     """ Parse the sessionstore file to extract urls. """
     tabs_data = None
+    url_dict = {}
     urls = []
+    pinned_urls = []
     with open(sessionstore) as f:
         tabs_data = json.loads(f.read())
         windows = tabs_data.get("windows")
@@ -39,28 +41,52 @@ def extract_urls(sessionstore):
                 for tab in window['tabs']:
                     if 'entries' in tab:
                         # the last one is the one currently displayed
-                        urls.append(tab['entries'][-1]['url'])
-    return(urls)
+                        url = tab['entries'][-1]['url']
+                        if 'pinned' in tab and tab['pinned'] == True:
+                            pinned_urls.append(url)
+                        else:
+                            urls.append(url)
+
+    if pinned_urls:
+        url_dict['pinned'] = pinned_urls
+    if urls:
+        url_dict['urls'] = urls
+
+    return(url_dict)
 
 
-def generate_output(urls):
+def generate_ul(url_list):
+    ul = '<ul>'
+    for url in url_list:
+        ul += '<li><a href="{url}">{url}</a></li>'.format(url=url)
+    ul += '</ul>'
+    return(ul)
+
+
+def generate_output(url_dict):
     """ Generate a HTML page with the list of urls. """
-    tabs_list = '<ul>'
-    for url in urls:
-        tabs_list += '<li><a href="{url}">{url}</a></li>'.format(url=url)
-    tabs_list += '</ul>'
+    content = ''
+
+    if 'pinned' in url_dict:
+        content += '<h2>Pinned tabs</h2>'
+        content += generate_ul(url_dict['pinned'])
+
+    if 'urls' in url_dict:
+        content += '<h2>All other tabs</h2>'
+        content += generate_ul(url_dict['urls'])
+
 
     template = Template("""<!DOCTYPE html>
     <html lang="en"><head>
         <meta charset="utf-8">
         <title>Generated list of Firefox opened tabs.</title>
     </head><body>
-    $tabs_list
+    $content
     </body></html>
     """)
 
     with open("firefox_opened_tabs.html", "w") as output:
-        output.write(template.substitute(tabs_list=tabs_list))
+        output.write(template.substitute(content=content))
 
 
 def main():
