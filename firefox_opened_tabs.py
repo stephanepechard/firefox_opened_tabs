@@ -9,7 +9,7 @@ from string import Template
 # some constants
 FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
 SESSION_FILE = "sessionstore.js"
-PREFIX = 'FOT_'
+PREFIX = '_FOT_'
 
 if not os.path.isdir(FF_DIR):
     sys.exit("ERROR: can't find your main Firefox directory :-(")
@@ -20,8 +20,8 @@ def find_ff_sessionstore():
     profile_dir = None
     files = os.listdir(FF_DIR)
     for f in files:
-        if os.path.isdir(os.path.join(FF_DIR, f)) and '.' in f and \
-            os.path.isfile(os.path.join(FF_DIR, f, SESSION_FILE)):
+        if os.path.isdir(os.path.join(FF_DIR, f)) and '.' in f \
+                and os.path.isfile(os.path.join(FF_DIR, f, SESSION_FILE)):
             profile_dir = os.path.join(FF_DIR, f)
             print("INFO: your Firefox profile directory is " + profile_dir)
     return(os.path.join(profile_dir, SESSION_FILE))
@@ -50,19 +50,23 @@ def extract_urls(sessionstore):
                 if 'entries' in tab:
                     # the last one in history is the one currently displayed
                     url = tab['entries'][-1]['url']
-                    if 'pinned' in tab and tab['pinned'] == True:
-                        pinned_urls.append(url)
+                    title = tab['entries'][-1]['title']
+                    li_dict = {'url': url, 'title': title}
+
+                    if 'pinned' in tab and tab['pinned'] is True:
+                        pinned_urls.append(li_dict)
                     else:
                         # is the tab in a group? (FF's Panorama feature)
-                        if 'extData' in tab and 'tabview-tab' in tab['extData']:
+                        if 'extData' in tab and \
+                                'tabview-tab' in tab['extData']:
                             tabview = json.loads(tab['extData']['tabview-tab'])
                             if 'groupID' in tabview:
                                 group_id = str(tabview['groupID'])
                                 if group_id:
                                     group = PREFIX + groups[group_id]['title']
-                                    url_dict[group].append(url)
+                                    url_dict[group].append(li_dict)
                         else:
-                            urls.append(url)
+                            urls.append(li_dict)
 
     # create dictionaries of urls
     if pinned_urls:
@@ -75,8 +79,9 @@ def extract_urls(sessionstore):
 
 def generate_ul(url_list):
     ul = '<ul>'
-    for url in url_list:
-        ul += '<li><a href="{url}">{url}</a></li>'.format(url=url)
+    for li_dict in url_list:
+        ul += '<li><a href="{u}">{t}</a></li>'.format(u=li_dict['url'],
+                                                      t=li_dict['title'])
     ul += '</ul>'
     return(ul)
 
@@ -115,6 +120,8 @@ def generate_output(url_dict):
     with open("firefox_opened_tabs.html", "w") as output:
         output.write(template.substitute(content=content))
 
+    print("INFO: list of opened tabs successfully written!")
+
 
 def main():
     sessionstore = find_ff_sessionstore()
@@ -124,4 +131,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
