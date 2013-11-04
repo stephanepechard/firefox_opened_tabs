@@ -9,7 +9,7 @@ from string import Template
 # some constants
 FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
 SESSION_FILE = "sessionstore.js"
-FOT_PREFIX = 'FOT_'
+PREFIX = 'FOT_'
 
 if not os.path.isdir(FF_DIR):
     sys.exit("ERROR: can't find your main Firefox directory :-(")
@@ -40,7 +40,7 @@ def extract_urls(sessionstore):
         if 'extData' in window and 'tabview-group' in window['extData']:
             groups = json.loads(window['extData']['tabview-group'])
             for group in groups:
-                url_dict[FOT_PREFIX + groups[group]['title']] = []
+                url_dict[PREFIX + groups[group]['title']] = []
 
         print("INFO: you have {} tabs in {} groups".format(len(window['tabs']),
                                                            len(groups)))
@@ -58,8 +58,9 @@ def extract_urls(sessionstore):
                             tabview = json.loads(tab['extData']['tabview-tab'])
                             if 'groupID' in tabview:
                                 group_id = str(tabview['groupID'])
-                                group = FOT_PREFIX + groups[group_id]['title']
-                                url_dict[group].append(url)
+                                if group_id:
+                                    group = PREFIX + groups[group_id]['title']
+                                    url_dict[group].append(url)
                         else:
                             urls.append(url)
 
@@ -70,9 +71,6 @@ def extract_urls(sessionstore):
         url_dict['urls'] = urls
 
     return(url_dict)
-
-
-#import ipdb;ipdb.set_trace()
 
 
 def generate_ul(url_list):
@@ -99,7 +97,7 @@ def generate_output(url_dict):
 
     for key in sorted(url_dict.keys()):
         if url_dict[key]:
-            title = key.replace(FOT_PREFIX, '')
+            title = key.replace(PREFIX, '')
             if not title:
                 title = 'Unnamed group'
             content += '<h2>{}</h2>'.format(title)
