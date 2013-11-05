@@ -38,13 +38,15 @@ def extract_urls(sessionstore):
         window = json.loads(f.read()).get("windows")[0]
         # find groups of tabs
         groups = None
+        nb_group = 0
         if 'extData' in window and 'tabview-group' in window['extData']:
             groups = json.loads(window['extData']['tabview-group'])
+            nb_group = len(groups)
             for group in groups:
                 url_dict[PREFIX + groups[group]['title']] = []
 
         print("INFO: you have {} tabs in {} groups".format(len(window['tabs']),
-                                                           len(groups)))
+                                                           nb_group))
 
         if 'tabs' in window:
             for tab in window['tabs']:
