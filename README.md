@@ -15,4 +15,17 @@ the list of all opened tabs in your Firefox. The script tries to find
 your Firefox profile's directory the best as it can. Tabs are grouped as they
 are in your Firefox.
 
-You can't do much more right now.
+With a specified file
+=====================
+
+You can also specified a file to be parsed by `firefox_opened_tabs` instead
+of the one of your profile with::
+
+    python3 firefox_opened_tabs.py /home/user/the_file.js
+
+
+About
+=====
+
+Made with love and Debian by Stéphane Péchard. Feel free to contribute,
+criticize and tell me what you think about it!
