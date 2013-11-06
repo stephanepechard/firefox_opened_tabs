@@ -16,10 +16,10 @@ your Firefox profile's directory the best as it can. Tabs are grouped as they
 are in your Firefox.
 
 With a specified file
-=====================
+---------------------
 
 You can also specified a file to be parsed by `firefox_opened_tabs` instead
-of the one of your profile with::
+of the one of your profile with:
 
     python3 firefox_opened_tabs.py /home/user/the_file.js
 
