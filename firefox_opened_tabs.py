@@ -21,10 +21,12 @@ def find_ff_sessionstore():
     profile_dir = None
     files = os.listdir(FF_DIR)
     for f in files:
-        if os.path.isdir(os.path.join(FF_DIR, f)) and '.' in f \
-                and os.path.isfile(os.path.join(FF_DIR, f, SESSION_FILE)):
-            profile_dir = os.path.join(FF_DIR, f)
-            print("INFO: your Firefox profile directory is " + profile_dir)
+        if os.path.isdir(os.path.join(FF_DIR, f)) and '.' in f:
+            if os.path.isfile(os.path.join(FF_DIR, f, SESSION_FILE)):
+                profile_dir = os.path.join(FF_DIR, f)
+                print("INFO: your Firefox profile directory is " + profile_dir)
+            else:
+                sys.exit("ERROR: can' find your Firefox session file...")
     return(os.path.join(profile_dir, SESSION_FILE))
 
 
