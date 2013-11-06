@@ -54,8 +54,11 @@ def extract_urls(sessionstore):
             for tab in window['tabs']:
                 if 'entries' in tab:
                     # the last one in history is the one currently displayed
-                    url = tab['entries'][-1]['url']
-                    title = tab['entries'][-1]['title']
+                    entry = tab['entries'][-1]
+                    url = entry['url']
+                    title = url
+                    if 'title' in entry:
+                        title = tab['entries'][-1]['title']
                     li_dict = {'url': url, 'title': title}
 
                     if 'pinned' in tab and tab['pinned'] is True:
@@ -67,7 +70,7 @@ def extract_urls(sessionstore):
                             tabview = json.loads(tab['extData']['tabview-tab'])
                             if 'groupID' in tabview:
                                 group_id = str(tabview['groupID'])
-                                if group_id:
+                                if group_id and group_id in groups:
                                     group = PREFIX + groups[group_id]['title']
                                     url_dict[group].append(li_dict)
                         else:
@@ -134,12 +137,16 @@ def write_file(content):
     print("INFO: list of opened tabs successfully written!")
 
 
-def main():
-    sessionstore = find_ff_sessionstore()
+def main(argv):
+    sessionstore = None
+    if len(argv) == 2 and os.path.isfile(argv[1]):
+        sessionstore = argv[1]
+    else:
+        sessionstore = find_ff_sessionstore()
     urls = extract_urls(sessionstore)
     html = generate_output(urls)
     write_file(html)
 
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv)
