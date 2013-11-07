@@ -12,12 +12,12 @@ FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
 SESSION_FILE = "sessionstore.js"
 PREFIX = '_FOT_'
 
-if not os.path.isdir(FF_DIR):
-    sys.exit("ERROR: can't find your main Firefox directory :-(")
-
 
 def find_ff_sessionstore():
     """ Find the right file to parse. """
+    if not os.path.isdir(FF_DIR):
+        sys.exit("ERROR: can't find your main Firefox directory :-(")
+
     profile_dir = None
     files = os.listdir(FF_DIR)
     for f in files:
