@@ -32,7 +32,7 @@ def find_ff_sessionstore():
 
 def extract_urls(sessionstore):
     """ Parse the sessionstore file to extract urls. """
-    urls = []
+    ungrouped_urls = []
     pinned_urls = []
     url_dict = {}
 
@@ -65,26 +65,25 @@ def extract_urls(sessionstore):
                         title = tab['entries'][-1]['title']
                     li_dict = {'url': url, 'title': title}
 
+                    # first possible case, the tab is pinned
                     if 'pinned' in tab and tab['pinned'] is True:
                         pinned_urls.append(li_dict)
+                    # or is the tab in a group? (FF's Panorama feature)
+                    elif 'extData' in tab and 'tabview-tab' in tab['extData']:
+                        tabview = json.loads(tab['extData']['tabview-tab'])
+                        if 'groupID' in tabview:
+                            group_id = str(tabview['groupID'])
+                            if group_id and group_id in groups:
+                                group = PREFIX + groups[group_id]['title']
+                                url_dict[group].append(li_dict)
                     else:
-                        # is the tab in a group? (FF's Panorama feature)
-                        if 'extData' in tab and \
-                                'tabview-tab' in tab['extData']:
-                            tabview = json.loads(tab['extData']['tabview-tab'])
-                            if 'groupID' in tabview:
-                                group_id = str(tabview['groupID'])
-                                if group_id and group_id in groups:
-                                    group = PREFIX + groups[group_id]['title']
-                                    url_dict[group].append(li_dict)
-                        else:
-                            urls.append(li_dict)
+                        ungrouped_urls.append(li_dict)
 
     # create dictionaries of urls
     if pinned_urls:
         url_dict['pinned'] = pinned_urls
-    if urls:
-        url_dict['urls'] = urls
+    if ungrouped_urls:
+        url_dict['ungrouped_urls'] = ungrouped_urls
 
     return(url_dict)
 
@@ -108,10 +107,10 @@ def generate_output(url_dict):
         content += generate_ul(url_dict['pinned'])
         url_dict.pop('pinned', None)
 
-    if 'urls' in url_dict:
+    if 'ungrouped_urls' in url_dict:
         content += '<h2>All other tabs</h2>'
-        content += generate_ul(url_dict['urls'])
-        url_dict.pop('urls', None)
+        content += generate_ul(url_dict['ungrouped_urls'])
+        url_dict.pop('ungrouped_urls', None)
 
     for key in sorted(url_dict.keys()):
         if url_dict[key]:
