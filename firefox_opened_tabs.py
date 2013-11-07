@@ -11,6 +11,7 @@ import sys
 FF_DIR = os.environ['HOME'] + "/.mozilla/firefox/"
 SESSION_FILE = "sessionstore.js"
 PREFIX = '_FOT_'
+FOT_HTML = "firefox_opened_tabs.html"
 
 
 def find_ff_sessionstore():
@@ -135,7 +136,7 @@ def generate_output(url_dict):
 
 
 def write_file(content):
-    with open("firefox_opened_tabs.html", "w") as output:
+    with open(FOT_HTML, "w") as output:
         output.write(content)
     print("INFO: list of opened tabs successfully written!")
 
