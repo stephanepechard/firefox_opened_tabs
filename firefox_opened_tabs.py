@@ -37,7 +37,11 @@ def extract_urls(sessionstore):
     url_dict = {}
 
     with open(sessionstore) as f:
-        window = json.loads(f.read()).get("windows")[0]
+        window = None
+        try:
+            window = json.loads(f.read()).get("windows")[0]
+        except ValueError:
+            sys.exit("ERROR: can't read the given file :-(")
         # find groups of tabs
         groups = None
         nb_group = 0
