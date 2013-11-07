@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.org/stephanepechard/firefox_opened_tabs.png?branch=master)](https://travis-ci.org/stephanepechard/firefox_opened_tabs)
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/stephanepechard/firefox_opened_tabs/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
 Firefox opened tabs script
 ==========================
 
