@@ -147,8 +147,8 @@ def main(argv):
     else:
         sessionstore = find_ff_sessionstore()
     urls = extract_urls(sessionstore)
-    html = generate_output(urls)
-    write_file(html)
+    output = generate_output(urls)
+    write_file(output)
 
 
 if __name__ == '__main__':
