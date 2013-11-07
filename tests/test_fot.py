@@ -20,7 +20,7 @@ import firefox_opened_tabs
 def remove_created_file():
     try:
         os.remove(firefox_opened_tabs.FOT_HTML)
-    except FileNotFoundError:
+    except OSError:
         pass
 
 
