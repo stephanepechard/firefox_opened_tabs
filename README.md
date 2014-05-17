@@ -5,7 +5,7 @@ Firefox opened tabs script
 ==========================
 
 A small Python3 script to extract opened tabs from Firefox.
-Should work on any UNIX-based systems with Python >= 3.2.
+Should work on Linux, Mac OS X and Windows systems with Python >= 3.2.
 
 
 Basic usage
