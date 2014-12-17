@@ -15,7 +15,12 @@ FF_PATHS = {
     'Windows': "AppData\Roaming\Mozilla\Firefox\Profiles"
 }
 FF_DIR = os.path.join(os.environ['HOME'], FF_PATHS[platform.system()])
-SESSION_FILE = "sessionstore.js"
+POSSIBLE_SESSION_FILES = [
+    "sessionstore.js",
+    os.path.join("sessionstore-backups", "recovery.js"),
+    os.path.join("sessionstore-backups", "recovery.bak"),
+    os.path.join("sessionstore-backups", "previous.js"),
+]
 PREFIX = '_FOT_'
 FOT_HTML = "firefox_opened_tabs.html"
 
@@ -25,16 +30,24 @@ def find_ff_sessionstore():
     if not os.path.isdir(FF_DIR):
         sys.exit("ERROR: can't find your main Firefox directory :-(")
 
+    session_file = None
     profile_dir = None
     files = os.listdir(FF_DIR)
     for f in files:
         if os.path.isdir(os.path.join(FF_DIR, f)) and '.' in f:
-            if os.path.isfile(os.path.join(FF_DIR, f, SESSION_FILE)):
-                profile_dir = os.path.join(FF_DIR, f)
-                print("INFO: your Firefox profile directory is " + profile_dir)
-            else:
-                sys.exit("ERROR: can' find your Firefox session file...")
-    return(os.path.join(profile_dir, SESSION_FILE))
+            found = False
+            for possible_session_file in POSSIBLE_SESSION_FILES:
+                if os.path.isfile(os.path.join(FF_DIR, f, possible_session_file)):
+                    profile_dir = os.path.join(FF_DIR, f)
+                    session_file = possible_session_file
+                    found = True
+                    print("INFO: your Firefox profile directory is " + profile_dir)
+                    break
+                else:
+                    print("WARN: can't find session file {}".format(possible_session_file))
+    if not found:
+        sys.exit("ERROR: can't find any session file")
+    return(os.path.join(profile_dir, session_file))
 
 
 def extract_urls(sessionstore):
